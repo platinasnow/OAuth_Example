@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+			http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+	<http auto-config="true" use-expressions="true" entry-point-ref="interceptFailureHandler">
+		<access-denied-handler ref="permissionEvaluator" />
+		<intercept-url pattern="/**" access="permitAll" />
+		<form-login login-page="/" default-target-url="/"
+			authentication-failure-handler-ref="loginFailureHandler" />
+		<logout invalidate-session="true" logout-url="/logout"
+			logout-success-url="/" />
+	</http>
+	<beans:bean id="loginFailureHandler" class="org.oauth.example.security.LoginFailureHandler"></beans:bean>
+	<beans:bean id="interceptFailureHandler" class="org.oauth.example.security.InterceptFailureHandler"></beans:bean>
+	<beans:bean id="permissionEvaluator" class="org.oauth.example.security.PermissionEvaluator" />
+
+	<authentication-manager>
+		<authentication-provider user-service-ref="securityService">
+			<password-encoder ref="passwordEncoder" />
+		</authentication-provider>
+	</authentication-manager>
+
+	<global-method-security secured-annotations="enabled"
+		jsr250-annotations="enabled" pre-post-annotations="enabled">
+	</global-method-security>
+
+	<beans:bean id="passwordEncoder"
+		class="org.springframework.security.authentication.encoding.ShaPasswordEncoder" />
+	<beans:bean id="securityService" class="org.oauth.example.security.CustomJdbcDaoImpl" />
+
+</beans:beans>
